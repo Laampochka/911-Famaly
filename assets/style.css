@@ -1,0 +1,121 @@
+
+
+.logo {
+    position: fixed;
+    /* top: 5em; */
+    left: 120px;
+    font-size: 24px
+}
+
+.header_back {
+    height: 60px;
+    /* position: fixed; */
+    margin-top: 2em;
+    background: linear-gradient(to right, #A80C0C 20%, rgba(0, 0, 0, 0.0));
+    width: 1920px;
+}
+body {
+    min-height: 100vh;
+    background-color: #171717;
+}
+.header_link {
+    color: #FFFFFF;
+    transition-duration: 300ms;
+    z-index: 999;
+    font-family: var(--gilroy-light);
+    text-decoration: none;
+}       
+
+.header_link:hover {
+    transition-duration: 300ms;
+    color: #EAC65E;
+}
+
+
+.header_button {
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: Transparent;
+}
+
+.header_nav {
+    /* padding-top: 25px; */
+    z-index: 999;
+    /* position: fixed; */
+}
+
+.header_table {
+    top : 2em ;
+    right: 120px;
+    gap: 0px;
+    display: flex;
+    justify-content: left;
+    position: absolute;
+}
+.header_item {
+    list-style-type: none;
+    margin: 0 60px;
+    font-size: 24px;
+    z-index: 999;
+    font-family: var(--gilroy);
+    color: var(--nav-text);
+
+}   
+.footer_text {
+    font-size: 18px;
+    font-family: var(--gilroy);
+    padding-left: 200px;
+    padding-bottom: 40px;
+    
+    color: white;
+}
+.footer_ {
+    gap: 220px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    margin-top: auto;
+    display: inline-flex;
+}
+
+.container__footer {
+    font-family: var(--gilroy);
+    color: var(--nav-text);
+    display: inline-flex;
+    row-gap: 60px;
+    justify-content: flex-end;
+    overflow: hidden;
+    
+    width:1920px;
+            
+}
+.container_hero{
+    justify-content: flex-end;
+    margin-right: 160px;
+    margin-left: 160px;
+    margin-top: 3em;
+    flex: 1;
+    display: flex;
+}
+.photo {
+    /* width: 2000px; */
+    height: 750px;
+    background-color: #6d0909;
+    margin-right: 80px;
+    background-image: url("Budodi.png");
+    
+    
+    width: 950px;
+
+        }  
+.Logo{
+    position: absolute;
+    top: 2em;
+    left: 160px;
+    font-size: 24px;
+}
+a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
