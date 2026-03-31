@@ -6,8 +6,9 @@ from controlers.testcontroller import TestController
 from controlers.articlecontroller import ArticlesController
 
 routes = {
-    "/articles":[ArticlesController, ArticlesController.index],
-
+    r'^/article/(\d+)/edit$':[ArticlesController, ArticlesController.edit],
+    r'^/article/(\d+)$':[ArticlesController, ArticlesController.view],
+    '/articles':[ArticlesController, ArticlesController.index],
     "/home":[SiteController, SiteController.index],
     "/about":[SiteController, SiteController.about],
     r"^/hello/(.*)$":[SiteController, SiteController.hello],

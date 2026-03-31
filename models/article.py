@@ -1,15 +1,74 @@
-from services.db import Db
+# from services.db import Db
+
+from models.active_record_entity import ActiveRecordEntity
 
 
-class Article():
+class Article(ActiveRecordEntity):
     __tablename__ = 'articles'
-    id = None
-    author_id = None
-    name = None
-    text = None
-    created_at = None
+    _id = None
+    _author_id = None
+    _name = None
+    _text = None
+    _created_at = None
 
-    def findAll(cls):
-        db = Db()
-        return db.query("SELECT * FROM 'articles'",{},cls)
-        # print(items)
+    def get_author_id(self):
+        return self._author_id
+    
+    def get_text(self):
+        return self._text
+
+    def get_name(self):
+        return self._name
+
+    def get_created_at(self):
+        return self._created_at
+
+    def set_author_id(self,_author_id):
+        self._author_id = _author_id
+
+    def set_name(self,name):
+        self._name = name
+
+    def set_text(self, text):
+        self._text = text
+
+    def set_created_at(self, created_at):
+        self._created_at = created_at
+
+
+    @staticmethod
+    def get_table_name():
+        return 'articles'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # def find_all(cls):
+    #     db = Db()
+    #     return db.query("SELECT * FROM 'articles'",{},cls)
+    #     # print(items)
+    # def get_by_id(id,cls):
+    #     db = Db()
+    #     return db.query(f"SELECT * FROM 'articles' WHERE id={id}",{},cls)[0]

@@ -1,1 +1,10 @@
 <h1 style="color: aliceblue;">{{h1}}</h1>
+<ul style="color: aliceblue;">
+    {% for article in articles %}
+        <li class="article">
+            <h2>{{ article.get_name() }}</h2>
+            <p>{{ article.get_text() }}</p>
+        </li>
+        <hr>
+    {% endfor %}
+</ul>
