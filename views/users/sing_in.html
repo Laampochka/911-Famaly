@@ -1,0 +1,27 @@
+<h1 style="color: aliceblue;">Sing In User</h1>
+
+
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}
+
+<div
+    style="color: aliceblue; margin: 0 auto; display: flex; justify-content: center; background-color:#252525; width: 200px; height: 300px;">
+
+    <form action="" method="POST" novalidate>
+        <div style="padding-bottom: 20px; padding-left: 10px; padding-top: 20px;">
+            <label for="inputName">Login</label>
+            <input type="text" id="inputName" class="form-control" name="nickname" {% if user_data %}
+                value="{{ user_data.nickname }}" {% endif %}>
+        </div>
+
+        <div style="padding-bottom: 20px; padding-left: 10px;">
+            <label for="inputPassword">Password</label>
+            <input type="password" id="inputPassword" class="form-control" name="password">
+        </div>
+
+        <input type="submit" style="background-color: #a17171; border: none; margin: 0 auto; padding-left: 30px;">
+
+    </form>
+
+</div>

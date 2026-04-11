@@ -7,6 +7,36 @@ class ActiveRecordEntity(metaclass = ABCMeta):
 
     _id = None
 
+
+    def delete(self):
+        db = Db()
+        table = self.__class__.get_table_name()
+        db.query(f'DELETE FROM `{table}` WHERE id = :id', {'id':self._id})
+        self.id = None
+        db.connection.commit()
+        db.connection.close()
+
+
+    def insert(self, mappedProperties):
+        filteredProperties = dict(filter(lambda item: item[1] is not None and item[1] != '', mappedProperties.items()))
+        columns = []
+        paramsNames = []
+        params2values = {}
+        for  columnName, value in filteredProperties.items():
+            columns.append('`' + columnName + '`')
+            paramsName = ':'+ columnName
+            paramsNames.append(paramsName)
+            params2values[columnName] = value
+
+        columnsViaSemicolon = ', '.join(columns)
+        paramsNamesViaSemicolon = ', '.join(paramsNames)
+
+        sql = 'INSERT INTO ' + self.__class__.get_table_name() + ' (' + columnsViaSemicolon + ' ) VALUES (' + paramsNamesViaSemicolon + ');'
+        db = Db()
+        db.query(sql, params2values, self.__class__)
+        db.connection.commit()
+        db.connection.close()
+
     def map_properties_to_db_format(self):
         properties = self.__dict__
         mappedProperties = {}
@@ -66,6 +96,18 @@ class ActiveRecordEntity(metaclass = ABCMeta):
         else:
             result = None
         return result
+
+    @classmethod
+    def find_one_by_column(cls, column_name, value):
+        db = Db()
+        table_name = cls.get_table_name()
+        result = db.query(f"SELECT * FROM `{table_name}` WHERE `{column_name}` = :value LIMIT 1;",{'value':value},cls)
+        if result != []:
+            result = result[0]
+        else:
+            result = None
+        return result
+
 
     @classmethod
     @abstractmethod

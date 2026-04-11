@@ -60,6 +60,9 @@ from webob import Request, Response
 import routes
 import handlers
 from whitenoise import WhiteNoise
+from exceptions import NotFoundException
+from exceptions import UnauthorizedException
+from views.view import View
 
 class API:
     def __init__(self , static_dir="assets"): 
@@ -81,16 +84,22 @@ class API:
     
     def handle_request(self, request):
         response = Response()
-
-        result = self.find_handler_re(request_path=request.path)
-        if result is not None:
+        try:
+            result = self.find_handler_re(request_path=request.path)
+            if result is  None:
+                raise NotFoundException("статья не найдена")
             handler,params = result
-            controller = handler[0]()
+            controller = handler[0](request)
             action = handler[1]
             action(controller,request, response, *params)
-           
-        else:
-            self.default_response(response)
+            
+
+        except NotFoundException as e:
+            response.status_code = 404
+            response.text = View('default').render_html('errors/404.html',{'error' : e})
+        except UnauthorizedException as e:
+            response.status_code = 401
+            response.text = View('default').render_html('errors/401.html',{'error' : e})
 
         return response
     

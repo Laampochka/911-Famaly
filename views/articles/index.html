@@ -1,9 +1,15 @@
 <h1 style="color: aliceblue;">{{h1}}</h1>
+
+
+
+
 <ul style="color: aliceblue;">
     {% for article in articles %}
         <li class="article">
             <h2>{{ article.get_name() }}</h2>
             <p>{{ article.get_text() }}</p>
+            <p>{{ article.get_id() }}</p>
+            <p>{{ article.get_aut().get_nickname()}}</p>
         </li>
         <hr>
     {% endfor %}

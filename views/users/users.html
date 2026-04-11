@@ -1,0 +1,12 @@
+
+
+
+
+<ul style="color: aliceblue;">
+    {% for user in user_data %}
+    <li class="user">
+        <h2>{% if user_data %} value = "{{ user_data.nickname }}" {% endif %}</h2>
+    </li>
+    <hr>
+    {% endfor %}
+</ul>

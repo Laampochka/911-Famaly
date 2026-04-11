@@ -1,7 +1,7 @@
 # from services.db import Db
 
 from models.active_record_entity import ActiveRecordEntity
-
+from models.user import User
 
 class Article(ActiveRecordEntity):
     __tablename__ = 'articles'
@@ -13,6 +13,9 @@ class Article(ActiveRecordEntity):
 
     def get_author_id(self):
         return self._author_id
+
+    def get_aut(self):
+        return User.get_by_id(self._author_id)
     
     def get_text(self):
         return self._text
@@ -29,10 +32,10 @@ class Article(ActiveRecordEntity):
     def set_name(self,name):
         self._name = name
 
-    def set_text(self, text):
+    def set_text(self,text):
         self._text = text
 
-    def set_created_at(self, created_at):
+    def set_created_at(self,created_at):
         self._created_at = created_at
 
 

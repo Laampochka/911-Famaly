@@ -20,6 +20,14 @@
 
             <ul class="header_table">
                 <li class="header_item">
+                    {% if user %}
+                        <p style="color: aliceblue;">{{user.get_nickname()}} <a href="/user/logout">Logout</a></p>
+                    {% else %}
+                        <p><a href="/user/login">Sing in</a></p>
+                    {% endif %}
+                </li>
+
+                <li class="header_item">
                     <a id="header_link_1" class="header_link" href="/forum.html">Home</a>
                 </li>
 
