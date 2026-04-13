@@ -14,7 +14,7 @@
 #         articles = Article.get_by_id(id, Article)
 #         # print(article)
 
-
+import cgi
 from controlers.controller import Controller
 from models.article import Article
 from models.user import User
@@ -52,12 +52,40 @@ class ArticlesController(Controller):
 
 
     def add(self, request, response):
-        article = Article()
-        article.set_author_id(1)
-        article.set_name('New Article')
-        article.set_text('mamatvoi')
+        if self.user is None:
+            raise UnauthorizedException("Необходимо авторизоваться")
 
-        article.save()
+        if request.method == 'POST':
+            try:
+                form = cgi.FieldStorage(fp=red.environ['wsgi.input'], environ=request.environ)
+                fields = {
+                    'name' : form.getvalue['name']
+                    'text' : form.getvalue['text']
+                }
+                img_file = form['img']
+                article = Article.create(fields, img_file, self.user)
+                if isinstance(article, Article):
+                    response.status_code = 302
+                    response.headers = [('Location', '/articles')]
+                    return
+                
+            except InvalidArgumentException as e:
+                response.text = self.view.render_html('users/sing_up.html', 
+                {
+                'title': 'MVC Framework - Sing up',
+                'user_data' : request.POST,
+                'error': e
+                })
+                return
+
+        response.text = self.view.render_html('articles/add.html', {'title' : 'Add article'})
+
+        # article = Article()
+        # article.set_author_id(1)
+        # article.set_name('New Article')
+        # article.set_text('mamatvoi')
+
+        # article.save()
 
 
     def delete(self, request, response, id):
