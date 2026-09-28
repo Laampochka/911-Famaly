@@ -113,3 +113,15 @@ class ActiveRecordEntity(metaclass = ABCMeta):
     @abstractmethod
     def get_table_name():
         pass
+
+    @classmethod
+    def search(cls, column, search_string):
+        allowed_columns = {'name', 'text', 'id', 'author_id', 'create_at'}
+        if column not in allowed_columns:
+            raise ValueError(f"Недопустимая колонка: {column}")
+
+        table = cls.get_table_name()
+        db = Db()
+        sql = f"SELECT * FROM `{table}` WHERE `{column}` LIKE ?"
+        params = (f"%{search_string}%",)
+        return db.query(sql, params, cls)

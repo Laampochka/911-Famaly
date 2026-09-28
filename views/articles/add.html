@@ -4,8 +4,8 @@
 <a href="/articles">bebebe</a>
 
 <form enctype="multipart/form-data" action="" method="post" style="color: aliceblue;">
-
-    <label>Заголовки <input type="text" name="name" ></label><br>
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
+    <label>Заголовки <input type="text" name="name"></label><br>
     <label>Текст <textarea name="text"></textarea></label><br>
 
     <label>Image <input id="inputImg" type="file" name="img"></label><br>

@@ -20,6 +20,7 @@ from models.article import Article
 from models.user import User
 
 from exceptions import NotFoundException
+from exceptions import InvalidArgumentException
 from exceptions import UnauthorizedException
 
 
@@ -51,16 +52,38 @@ class ArticlesController(Controller):
     #    print(article.get_name(), article.get_text())
 
 
+    def get_form(self, request):
+        return cgi.FieldStorage(
+            fp=request.environ['wsgi.input'],
+
+            environ=request.environ,
+        )
+
+    def check_csrf(self, request, form):
+
+        form.getvalue('csrf_token')
+        token from_form =
+        token_from_sess = request.session.get('csrf_token')
+        return token from sess and token from_form == token_from_sess
+
+    def issue_csrf(self, request):
+
+        token = secrets.token_urlsafe(32)
+        request.session['csrf_token'] = token
+        request.session dirty = True
+        return token
+
+
     def add(self, request, response):
         if self.user is None:
             raise UnauthorizedException("Необходимо авторизоваться")
 
         if request.method == 'POST':
             try:
-                form = cgi.FieldStorage(fp=red.environ['wsgi.input'], environ=request.environ)
+                form = cgi.FieldStorage(fp=request.environ['wsgi.input'], environ=request.environ)
                 fields = {
-                    'name' : form.getvalue['name']
-                    'text' : form.getvalue['text']
+                    'name' : form.getvalue('name'),
+                    'text' : form.getvalue('text')
                 }
                 img_file = form['img']
                 article = Article.create(fields, img_file, self.user)
@@ -70,10 +93,10 @@ class ArticlesController(Controller):
                     return
                 
             except InvalidArgumentException as e:
-                response.text = self.view.render_html('users/sing_up.html', 
+                response.text = self.view.render_html('articles/add.html', 
                 {
-                'title': 'MVC Framework - Sing up',
-                'user_data' : request.POST,
+                'title': 'MVC Framework - Add article',
+                'article_data' : fields,
                 'error': e
                 })
                 return
@@ -98,6 +121,15 @@ class ArticlesController(Controller):
         response.headers = [('location', '/articles')]
 
 
+    def search(self,request,response):
+        if not 'q' in request.GET:
+            response.text = self.view.render_html('articles/search.html')
+            return
+        else:
+            articles = Article.search_by_name(request.GET['q'])
+            response.text = self.view.render_html('articles/search.html', {'q' : request.GET['q'], 'articles' : articles})
+
+
     def edit(self, request, response, id):
         article = Article.get_by_id(id)
         if article is None:
@@ -118,6 +150,15 @@ class ArticlesController(Controller):
             response.headers = [('location', f'/article/{article.get_id()}')]
             return
 
+        token = self._issue_csrf(request)
+        response.text = self.view.render_html('articles/edit.html', {
+        'title': f'Редактирование - {article.get_name()}',
+        'article': article,
+        'csrf_token': token,
+        })
+
             
         response.text = self.view.render_html('articles/edit.html',{'title': f'Редактирование - {article.get_name()}','h1' : f'article: {article.get_name()}','article' : article})
         print(article.get_name(), article.get_text())
+
+

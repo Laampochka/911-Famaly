@@ -64,10 +64,14 @@ from exceptions import NotFoundException
 from exceptions import UnauthorizedException
 from views.view import View
 
+
+SECRET_KEY ='uytrewsdfxfcvbnmjiuy76543wesdfcvhiui87654erdfcg'
+
 class API:
     def __init__(self , static_dir="assets"): 
         self.routes = routes.routes
         self.whitenoise =WhiteNoise(self.wsgi_app, root=static_dir)
+        self.serializer = URLSafeTimedSerializer(SECRET_KEY)
 
     def wsgi_app(self, environ, start_response):
         request = Request(environ)

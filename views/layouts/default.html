@@ -21,9 +21,9 @@
             <ul class="header_table">
                 <li class="header_item">
                     {% if user %}
-                        <p style="color: aliceblue;">{{user.get_nickname()}} <a href="/user/logout">Logout</a></p>
+                    <p style="color: aliceblue;">{{user.get_nickname()}} <a href="/user/logout">Logout</a></p>
                     {% else %}
-                        <p><a href="/user/login">Sing in</a></p>
+                    <p><a href="/user/login">Sing in</a></p>
                     {% endif %}
                 </li>
 
@@ -39,6 +39,9 @@
                 </li>
                 <li class="header_item">
                     <a id="header_link_2" class="header_link" href="#catalog">Seasons</a>
+                </li>
+                <li class="header_item">
+                    <a id="header_link_2" class="header_link" href="/articles/search">Search</a>
                 </li>
 
             </ul>

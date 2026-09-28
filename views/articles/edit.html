@@ -3,7 +3,7 @@
 <a href="/articles">bebebe</a>
 
 <form action="" method="post" style="color: aliceblue;">
-
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
     <label>Заголовки <input type="text" name="name" value={{article.get_name()}}></label><br>
     <label>Текст <textarea name="text">{{article.get_text()}}</textarea></label><br>
     <input type="submit" value="Обновить">

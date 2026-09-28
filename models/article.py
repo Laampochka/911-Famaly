@@ -2,6 +2,10 @@
 
 from models.active_record_entity import ActiveRecordEntity
 from models.user import User
+import cgi
+import os
+
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 class Article(ActiveRecordEntity):
     __tablename__ = 'articles'
@@ -14,11 +18,13 @@ class Article(ActiveRecordEntity):
     def get_author_id(self):
         return self._author_id
 
-    def get_aut(self):
+    def get_author(self):
         return User.get_by_id(self._author_id)
     
     def get_text(self):
         return self._text
+    def get_img(self):
+        return getattr(self, '_img', None)
 
     def get_name(self):
         return self._name
@@ -42,36 +48,75 @@ class Article(ActiveRecordEntity):
     @staticmethod
     def get_table_name():
         return 'articles'
+    
+    @staticmethod
+    def search_by_name(search_string):
+        return __class__.search('name', search_string)
+
+
+
+    @staticmethod
+    def create(fields, img_file, author):
+        if not fields['name']:
+            raise InvalidArgumentException('не передано название статьи')
+
+        if not fields['text']:
+            raise InvalidArgumentException('не передан текст статьи')
+
+        if __class__.check_file_size(img_file, MAX_FILE_SIZE)[0] == False :
+            raise InvalidArgumentException('Слишком большой файл! Должно быть не более 5МБ')
+
+
+        article = Article()
+        article._name = fields['name']
+        article._text = fields['text']
+        article._author_id = author.get_id()
+
+        if img_file.filename:
+            file_path = 'uploads/' +  img_file.filename
+            article._img = file_path
+            os.makedirs('/uploads', exist_ok=True)
+            with open(file_path, 'wb') as f:
+                while True:
+                    chunk = img_file.file.read(8192)  # Читаем файл по частям
+                    if not chunk:
+                        break
+                    f.write(chunk)
+
+        article.save()
+        return article
 
 
 
 
+    @staticmethod
+    def check_file_size(file_item, max_size):
+        """
+        Проверка размера файла без загрузки всего файла в память.
+        Читает файл по частям и суммирует их размер.
+        """
+        total_size = 0
+        chunk_size = 8192  # Читаем по 8KB
 
+        # Сохраняем текущую позицию, чтобы потом вернуться
+        current_pos = file_item.file.tell()
 
+        try:
+            # Перемещаемся в начало файла
+            file_item.file.seek(0)
 
+            # Читаем файл по частям и суммируем размер
+            while True:
+                chunk = file_item.file.read(chunk_size)
+                if not chunk:
+                    break
+                total_size += len(chunk)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # def find_all(cls):
-    #     db = Db()
-    #     return db.query("SELECT * FROM 'articles'",{},cls)
-    #     # print(items)
-    # def get_by_id(id,cls):
-    #     db = Db()
-    #     return db.query(f"SELECT * FROM 'articles' WHERE id={id}",{},cls)[0]
+                # Если уже превысили лимит, можно прервать проверку
+                if total_size > max_size:
+                    break
+        finally:
+            # Возвращаемся на исходную позицию для последующего чтения
+            file_item.file.seek(current_pos)
+        print(total_size)
+        return total_size <= max_size, total_size

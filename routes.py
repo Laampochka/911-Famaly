@@ -15,12 +15,15 @@ routes = {
     r'^/article/(\d+)$':[ArticlesController, ArticlesController.view],
     r'^/article/(\d+)/delete$':[ArticlesController, ArticlesController.delete],
     r'^/articles/add$':[ArticlesController, ArticlesController.add],
+    r'^/articles/search$':[ArticlesController, ArticlesController.search],
+
     '/articles':[ArticlesController, ArticlesController.index],
 
     r'^/user/register$':[UsersController, UsersController.sing_up],
     r'^/user/login$':[UsersController, UsersController.sing_in],
     r'^/user/logout$':[UsersController, UsersController.logout],
     r'^/user/users$':[UsersController, UsersController.index],
+    
 
     "/home":[SiteController, SiteController.index],
     "/about":[SiteController, SiteController.about],
