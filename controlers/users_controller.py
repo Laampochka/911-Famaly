@@ -39,31 +39,39 @@ class UsersController(Controller):
         })
 
     def sing_in(self, request, response):
-
         if request.method == 'POST':
+            data = User._read_auth_fields(request)     # ← вместо ручного dict
+            print('data:', data)                        # можно оставить для отладки
             try:
-                user = User.sing_in(request.POST)
+                user = User.sing_in(data)
                 if isinstance(user, User):
                     token = UserAuthService.create_token(user)
-                    response.set_cookie('token', token, 500,'/', False, httponly = True)
+                    response.set_cookie(
+                        'token', token,
+                        max_age=86400,
+                        path='/',
+                        httponly=True,
+                        samesite='Lax',
+                    )
                     response.status_code = 302
-                    response.location = '/articles'
-                    # print("Login OK")
-                    # response.text = self.view.render_html('users/singUpSuccess.html',{})
+                    response.location = '/api/articles'
                     return
-                
+                response.text = self.view.render_html('users/sing_in.html', {
+                    'title': 'MVC Framework - Sing in',
+                    'user_data': data,
+                    'error': 'Неверный логин или пароль',
+                })
+                return
             except InvalidArgumentException as e:
-                response.text = self.view.render_html('users/sing_up.html', 
-                {
-                'title': 'MVC Framework - Sing in',
-                'user_data' : request.POST,
-                'error': e
+                response.text = self.view.render_html('users/sing_in.html', {
+                    'title': 'MVC Framework - Sing in',
+                    'user_data': data,
+                    'error': e,
                 })
                 return
 
-        response.text = self.view.render_html('users/sing_in.html', 
-        {
-        'title': 'MVC Framework - Sing in',
+        response.text = self.view.render_html('users/sing_in.html', {
+            'title': 'MVC Framework - Sing in',
         })
 
     def logout(self, request, response):

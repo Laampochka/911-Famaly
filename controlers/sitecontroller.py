@@ -1,16 +1,17 @@
 from views.view import View
 from controlers.controller import Controller
 from services.db import Db
+from models.article import Article
 
 
 
 class SiteController(Controller):
 
     def index(self, request, response):
-        db = Db()
-        items = db.query("SELECT * FROM 'articles'")
-        print(items)
-        # response.text = self.view.render_html('site/index.html', {'title':'mvc Framework','h1':'Main page'})
+        response.text = self.view.render_html('api/index.html', {
+            'title': 'mvc Framework - API docs',
+            'h1': 'API documentation',
+        })
 
 
     def about(self, request, response):

@@ -6,7 +6,11 @@ class Db:
         self.connection = sqlite3.connect('bd1')
         self.connection.row_factory = sqlite3.Row
 
-    def query(self, sql, params={}, cls=''):
+    def query(self, sql, params=None, cls=None):
+        if cls is None:
+            raise ValueError("Db.query: не передан класс модели (cls)")
+        params = params or {}
+        
         cursor = self.connection.cursor()
         rows = cursor.execute(sql, params).fetchall()
 

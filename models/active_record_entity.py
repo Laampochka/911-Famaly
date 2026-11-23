@@ -11,10 +11,18 @@ class ActiveRecordEntity(metaclass = ABCMeta):
     def delete(self):
         db = Db()
         table = self.__class__.get_table_name()
-        db.query(f'DELETE FROM `{table}` WHERE id = :id', {'id':self._id})
-        self.id = None
-        db.connection.commit()
+        db.query(
+            f'DELETE FROM `{table}` WHERE id = :id',
+            {'id': self._id},
+            self.__class__,
+        )
+        db.connection.commit()          # ← обязательно
         db.connection.close()
+        self._id = None
+
+
+    def to_dict(self):
+        return self.map_properties_to_db_format()
 
 
     def insert(self, mappedProperties):

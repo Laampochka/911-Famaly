@@ -61,64 +61,35 @@ class User(ActiveRecordEntity):
 
     @staticmethod
     def sing_up(user_data):
-        if not user_data['nickname']:
-            raise InvalidArgumentException('Dont transpert "Login"')
+        nickname = (user_data.get('nickname') or '').strip()
+        email = (user_data.get('email') or '').strip()
+        password = user_data.get('password') or ''
 
-        if re.search(r'^[a-zA-Z0-9]+$', user_data['nickname']) is None:
-            raise InvalidArgumentException('You fuckin" stupid bro')
+        if not nickname:
+            raise InvalidArgumentException('Не передан логин')
+        if re.search(r'^[a-zA-Z0-9]+$', nickname) is None:
+            raise InvalidArgumentException('Логин: только латиница и цифры')
+        if User.find_one_by_column('nickname', nickname):
+            raise InvalidArgumentException('Логин уже занят')
 
-        if __class__.find_one_by_column('nickname',user_data['nickname']):
-            raise InvalidArgumentException('HAHA Deepfacer byeee')
-
-
-        if not user_data['email']:
-            raise InvalidArgumentException('Dont transpert "email"')
-
+        if not email:
+            raise InvalidArgumentException('Не передан email')
         try:
-            validate_email(user_data['email'])
-        except EmailNotValidError as e:
-            raise InvalidArgumentException('Your mom is hoe')
+            validate_email(email)
+        except EmailNotValidError:
+            raise InvalidArgumentException('Некорректный email')
+        if User.find_one_by_column('email', email):
+            raise InvalidArgumentException('Email уже занят')
 
-        if __class__.find_one_by_column('email',user_data['email']):
-            raise InvalidArgumentException('HAHA Deepfacer byeee')
-
-
-        if not user_data['password']:
-            raise InvalidArgumentException('Dont transpert "password"')
-
-        if len(user_data['password']) <8:
-            raise InvalidArgumentException('Haha short dich')
+        if len(password) < 8:
+            raise InvalidArgumentException('Пароль минимум 8 символов')
 
         user = User()
-        user._nickname = user_data['nickname']
-        user._email = user_data['email']
+        user._nickname = nickname
+        user._email = email
         user._is_confirmed = True
         user._role = 'user'
-        user._password_hash = generate_password_hash(user_data['password'])
-        user.refresh_auth_token()
-        user.save()
-        return user
-
-
-
-    def sing_in(user_data):
-        if not user_data['nickname']:
-            raise InvalidArgumentException('Dont transpert "Login"')
-
-        if re.search(r'^[a-zA-Z0-9]+$', user_data['nickname']) is None:
-            raise InvalidArgumentException('You fuckin" stupid bro')
-
-
-        user = User.find_one_by_column('nickname', user_data['nickname'])
-
-        if user is None:
-            raise InvalidArgumentException('Your pussword or login does not correct')
-
-        if check_password_hash(user_data['password'], user.get_password_hash):
-            raise InvalidArgumentException('Your pussword or login does not correct')
-
-
-
+        user._password_hash = generate_password_hash(password)
         user.refresh_auth_token()
         user.save()
         return user
@@ -126,8 +97,50 @@ class User(ActiveRecordEntity):
 
 
     @staticmethod
+    def sing_in(user_data):
+        nickname = (user_data.get('nickname') or '').strip()
+        password = user_data.get('password') or ''
+
+        if not nickname:
+            raise InvalidArgumentException('Не передан логин')
+
+        if not re.search(r'^[a-zA-Z0-9]+$', nickname):
+            raise InvalidArgumentException('Логин: только латиница и цифры')
+
+        user = User.find_one_by_column('nickname', nickname)
+        if user is None:
+            raise InvalidArgumentException('Неверный логин или пароль')
+
+        from werkzeug.security import check_password_hash
+        if not check_password_hash(user.get_password_hash(), password):
+            raise InvalidArgumentException('Неверный логин или пароль')
+
+        user.refresh_auth_token()
+        user.save()
+        return user
+
+    @staticmethod
+    def _read_auth_fields(request):
+        if request.content_type == 'application/json':
+            data = request.json or {}
+            return {
+                'nickname': (data.get('nickname') or '').strip(),
+                'password': data.get('password') or '',
+            }
+        return {
+            'nickname': (request.POST.get('nickname') or '').strip(),
+            'password': request.POST.get('password') or '',
+        } 
+
+
+
+    @staticmethod
     def get_table_name():
         return 'users'
+
+
+
+
 
 
 

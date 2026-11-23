@@ -1,5 +1,6 @@
 import os
 from jinja2 import Environment , FileSystemLoader
+import json
 
 class View:
     def __init__(self, layout ):
@@ -18,4 +19,7 @@ class View:
 
     def set_var(self, name, value):
         self.extra_vars[name] = value
+
+    def display_json(self,data,code=200):
+        return json.dumps(data)        
 

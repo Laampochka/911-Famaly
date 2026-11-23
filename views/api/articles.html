@@ -1,0 +1,729 @@
+<style>
+    .articles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+        max-width: 1400px;
+        margin: 3em auto;
+        padding: 0 2em;
+    }
+
+    .article-card {
+        display: flex;
+        flex-direction: column;
+        background: #1f1f1f;
+        border: 1px solid #2e2e2e;
+        border-radius: 16px;
+        overflow: hidden;
+        color: #eaeaea;
+        font-family: var(--gilroy, Arial, sans-serif);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        text-decoration: none;
+    }
+
+    .article-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        border-color: #A80C0C;
+    }
+
+    .article-card .cover {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .article-card .cover-empty {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #2a0a0a, #171717);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c6c6c;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .article-card .card-body {
+        padding: 20px 24px 24px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .article-card h2 {
+        color: #fff;
+        font-size: 1.25rem;
+        margin: 0 0 12px;
+        line-height: 1.3;
+    }
+
+    .article-card .preview {
+        color: #b0b0b0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        flex-grow: 1;
+        margin: 0 0 16px;
+    }
+
+    .article-card .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 14px;
+        border-top: 1px solid #2e2e2e;
+        font-size: 0.85rem;
+        color: #9a9a9a;
+    }
+
+    .article-card .meta strong {
+        color: #EAC65E;
+        font-weight: 600;
+    }
+
+    .article-card .read-btn {
+        color: #EAC65E;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .article-card .read-btn:hover {
+        color: #fff;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #9a9a9a;
+        font-size: 1.1rem;
+        margin: 4em 0;
+    }
+
+    .add-article {
+        max-width: 700px;
+        margin: 3em auto 1em;
+        padding: 28px 32px;
+        background: #1f1f1f;
+        border: 1px solid #2e2e2e;
+        border-radius: 16px;
+        color: #eaeaea;
+        font-family: var(--gilroy, Arial, sans-serif);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .add-article h2 {
+        margin: 0 0 20px;
+        color: #fff;
+        font-size: 1.4rem;
+    }
+
+    .add-article label {
+        display: block;
+        margin-bottom: 16px;
+        font-size: 0.95rem;
+        color: #b0b0b0;
+    }
+
+    .add-article input[type="text"],
+    .add-article textarea {
+        width: 100%;
+        margin-top: 6px;
+        padding: 10px 12px;
+        background: #262626;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #eaeaea;
+        font-family: inherit;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .add-article input[type="text"]:focus,
+    .add-article textarea:focus {
+        border-color: #A80C0C;
+    }
+
+    .add-article textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .add-article input[type="file"] {
+        color: #b0b0b0;
+        font-size: 0.9rem;
+    }
+
+    .add-article button {
+        padding: 10px 24px;
+        background: #A80C0C;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .add-article button:hover {
+        background: #d41a1a;
+    }
+
+    .add-article button:disabled {
+        background: #555;
+        cursor: not-allowed;
+    }
+
+    .form-error {
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        background: #4a1f1f;
+        border: 1px solid #a33;
+        border-radius: 8px;
+        color: #ffb3b3;
+        font-size: 0.95rem;
+    }
+
+    .login-note {
+        text-align: center;
+        color: #b0b0b0;
+        margin: 3em auto 1em;
+    }
+
+    .login-note a {
+        color: #EAC65E;
+    }
+
+    .article-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article-card .card-link {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .article-card .card-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-top: 1px solid #2e2e2e;
+        font-size: 0.85rem;
+        color: #9a9a9a;
+    }
+
+    .article-card .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 6px;
+        align-items: center;
+    }
+
+    .article-card .icon-btn {
+        background: transparent;
+        border: 1px solid #333;
+        color: #eaeaea;
+        border-radius: 6px;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .article-card .icon-btn:hover {
+        background: #262626;
+        border-color: #A80C0C;
+    }
+
+    .article-card .btn-delete:hover {
+        color: #ff7070;
+        border-color: #a33;
+    }
+
+    /* модальное окно */
+    .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-box {
+        position: relative;
+        z-index: 1;
+        background: #1f1f1f;
+        border: 1px solid #2e2e2e;
+        border-radius: 16px;
+        padding: 28px 32px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        color: #eaeaea;
+        font-family: var(--gilroy, Arial, sans-serif);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-box h2 {
+        color: #fff;
+        margin: 0 0 20px;
+    }
+
+    .modal-box label {
+        display: block;
+        margin-bottom: 16px;
+        color: #b0b0b0;
+        font-size: 0.95rem;
+    }
+
+    .modal-box input[type="text"],
+    .modal-box textarea {
+        width: 100%;
+        margin-top: 6px;
+        padding: 10px 12px;
+        background: #262626;
+        border: 1px solid #333;
+        border-radius: 8px;
+        color: #eaeaea;
+        font-family: inherit;
+        font-size: 0.95rem;
+        outline: none;
+    }
+
+    .modal-box textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .modal-actions button {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .modal-actions .btn-primary {
+        background: #A80C0C;
+        color: #fff;
+    }
+
+    .modal-actions .btn-primary:hover {
+        background: #d41a1a;
+    }
+
+    .modal-actions .btn-secondary {
+        background: #333;
+        color: #eaeaea;
+    }
+
+    .modal-actions .btn-secondary:hover {
+        background: #444;
+    }
+</style>
+
+{% if user %}
+<div class="add-article">
+    <h2>Добавить статью</h2>
+    <div id="form-error" class="form-error" style="display:none;"></div>
+
+    <form id="add-article-form" enctype="multipart/form-data">
+        <label>Название
+            <input type="text" name="name" required maxlength="200">
+        </label>
+        <label>Текст
+            <textarea name="text" required></textarea>
+        </label>
+        <label>Изображение (необязательно)
+            <input type="file" name="img" accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp">
+        </label>
+        <button type="submit" id="submit-btn">Добавить</button>
+    </form>
+</div>
+{% else %}
+<p class="login-note">
+    <a href="/user/login">войдите</a>.
+</p>
+{% endif %}
+
+{% if articles %}
+<div class="articles-grid" id="articles-grid">
+    {% for article in articles %}
+    <div class="article-card" data-id="{{ article.get_id() }}">
+        <a href="/api/article/{{ article.get_id() }}" class="card-link">
+            {% if article.get_img() %}
+            <img class="cover" src="/{{ article.get_img() }}" alt="{{ article.get_name() }}">
+            {% else %}
+            <div class="cover-empty">НЕТ ИЗОБРАЖЕНИЯ</div>
+            {% endif %}
+            <div class="card-body">
+                <h2>{{ article.get_name() }}</h2>
+                <p class="preview">
+                    {{ article.get_text()[:140] }}{% if article.get_text()|length > 140 %}…{% endif %}
+                </p>
+            </div>
+        </a>
+
+        <div class="card-footer">
+            <span>Автор: <strong>
+                    {{ article.get_author().get_nickname() if article.get_author() else article.get_author_id() }}
+                </strong></span>
+
+            <div class="card-actions">
+                <a href="/api/article/{{ article.get_id() }}" class="read-btn">Читать →</a>
+
+                {% if user and (user.get_id() == article.get_author_id() or user.get_role() == 'admin') %}
+                <button type="button" class="icon-btn btn-edit" data-id="{{ article.get_id() }}"
+                    data-name="{{ article.get_name() }}" data-text="{{ article.get_text() }}"
+                    title="Редактировать">Редактировать</button>
+                <button type="button" class="icon-btn btn-delete" data-id="{{ article.get_id() }}"
+                    data-name="{{ article.get_name() }}" title="Удалить">Удалить</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty-state" id="empty-state">Статей пока нет</p>
+{% endif %}
+
+<div id="edit-modal" class="modal" style="display:none;">
+    <div class="modal-backdrop" id="edit-backdrop"></div>
+    <div class="modal-box">
+        <h2>Редактировать статью</h2>
+        <div id="edit-error" class="form-error" style="display:none;"></div>
+        <form id="edit-form">
+            <input type="hidden" name="id" id="edit-id">
+            <label>Название
+                <input type="text" name="name" id="edit-name" required maxlength="200">
+            </label>
+            <label>Текст
+                <textarea name="text" id="edit-text" required></textarea>
+            </label>
+            <label>Новое изображение (необязательно)
+                <input type="file" name="img"
+                    accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp">
+            </label>
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary" id="edit-save">Сохранить</button>
+                <button type="button" class="btn-secondary" id="edit-cancel">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    (function () {
+        'use strict';
+
+        // ============================================================
+        //  УТИЛИТЫ
+        // ============================================================
+
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+
+        async function readJson(response) {
+            try { return await response.json(); }
+            catch (_) { return {}; }
+        }
+
+        function humanError(response, data, fallback) {
+            if (response.status === 401) return 'Вы не авторизованы. Войдите заново.';
+            if (response.status === 403) return 'Нет прав на это действие.';
+            if (response.status === 422) return data.error || 'Ошибка валидации';
+            if (response.status === 404) return 'Статья не найдена';
+            return data.error || (fallback + ' (HTTP ' + response.status + ')');
+        }
+
+        // ============================================================
+        //  КАРТОЧКА В DOM (сборка HTML по данным из JSON)
+        // ============================================================
+
+        function cardHtml(a, canModify) {
+            const imgHtml = a.img
+                ? `<img class="cover" src="/${esc(a.img)}" alt="${esc(a.name)}">`
+                : `<div class="cover-empty">НЕТ ИЗОБРАЖЕНИЯ</div>`;
+
+            const text = esc(a.text || '');
+            const preview = text.length > 140 ? text.slice(0, 140) + '…' : text;
+            const author = esc(a.author_nickname ?? a.author_id);
+
+            const actionsHtml = canModify ? `
+            <button type="button" class="icon-btn btn-edit"
+                    data-id="${esc(a.id)}"
+                    data-name="${esc(a.name)}"
+                    data-text="${esc(a.text || '')}"
+                    title="Редактировать">✎</button>
+            <button type="button" class="icon-btn btn-delete"
+                    data-id="${esc(a.id)}"
+                    data-name="${esc(a.name)}"
+                    title="Удалить">🗑</button>
+        ` : '';
+
+            return `
+            <div class="article-card" data-id="${esc(a.id)}">
+                <a href="/api/article/${esc(a.id)}" class="card-link">
+                    ${imgHtml}
+                    <div class="card-body">
+                        <h2>${esc(a.name)}</h2>
+                        <p class="preview">${preview}</p>
+                    </div>
+                </a>
+                <div class="card-footer">
+                    <span>Автор: <strong>${author}</strong></span>
+                    <div class="card-actions">
+                        <a href="/api/article/${esc(a.id)}" class="read-btn">Читать →</a>
+                        ${actionsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+        }
+
+        function updateCardInDom(a, canModify) {
+            const card = document.querySelector(`.article-card[data-id="${a.id}"]`);
+            if (!card) return;
+
+            // заголовок
+            const title = card.querySelector('h2');
+            if (title) title.textContent = a.name;
+
+            // превью
+            const preview = card.querySelector('.preview');
+            if (preview) {
+                const text = a.text || '';
+                preview.textContent = text.length > 140 ? text.slice(0, 140) + '…' : text;
+            }
+
+            // обложка
+            const link = card.querySelector('.card-link');
+            if (link) {
+                const old = link.querySelector('.cover, .cover-empty');
+                if (old) old.remove();
+
+                let el;
+                if (a.img) {
+                    el = document.createElement('img');
+                    el.className = 'cover';
+                    el.src = '/' + a.img;
+                    el.alt = a.name;
+                } else {
+                    el = document.createElement('div');
+                    el.className = 'cover-empty';
+                    el.textContent = 'НЕТ ИЗОБРАЖЕНИЯ';
+                }
+                link.insertBefore(el, link.firstChild);
+            }
+
+            // data-атрибуты кнопки edit (для повторного открытия модалки)
+            const editBtn = card.querySelector('.btn-edit');
+            if (editBtn) {
+                editBtn.dataset.name = a.name;
+                editBtn.dataset.text = a.text || '';
+            }
+
+            // если появилась/пропала кнопка edit — пересобирать не обязательно,
+            // но если автор изменился (не должно), это отдельный сценарий.
+        }
+
+        // ============================================================
+        //  ДОБАВЛЕНИЕ СТАТЬИ
+        // ============================================================
+
+        (function initAddForm() {
+            const form = document.getElementById('add-article-form');
+            if (!form) return;                 // пользователь не залогинен
+
+            const errorBox = document.getElementById('form-error');
+            const submitBtn = document.getElementById('submit-btn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorBox.style.display = 'none';
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Отправка…';
+
+                try {
+                    const r = await fetch('/api/articles', {
+                        method: 'POST',
+                        body: new FormData(form),
+                        credentials: 'same-origin',
+                    });
+                    const data = await readJson(r);
+
+                    if (!r.ok) throw new Error(humanError(r, data, 'Не удалось создать'));
+
+                    form.reset();
+
+                    const grid = document.getElementById('articles-grid');
+                    const empty = document.getElementById('empty-state');
+
+                    if (grid) {
+                        // canModify = true (только что создали — точно автор/админ)
+                        grid.insertAdjacentHTML('afterbegin', cardHtml(data.article, true));
+                    } else {
+                        if (empty) empty.remove();
+                        const newGrid = document.createElement('div');
+                        newGrid.className = 'articles-grid';
+                        newGrid.id = 'articles-grid';
+                        newGrid.innerHTML = cardHtml(data.article, true);
+                        document.body.insertBefore(newGrid, form.parentElement.nextSibling);
+                    }
+                } catch (err) {
+                    errorBox.textContent = err.message;
+                    errorBox.style.display = 'block';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Добавить';
+                }
+            });
+        })();
+
+        // ============================================================
+        //  РЕДАКТИРОВАНИЕ (модалка)
+        // ============================================================
+
+        (function initEdit() {
+            const modal = document.getElementById('edit-modal');
+            if (!modal) return;
+
+            const form = document.getElementById('edit-form');
+            const errorBox = document.getElementById('edit-error');
+            const saveBtn = document.getElementById('edit-save');
+
+            function openModal(btn) {
+                form.reset();
+                document.getElementById('edit-id').value = btn.dataset.id;
+                document.getElementById('edit-name').value = btn.dataset.name;
+                document.getElementById('edit-text').value = btn.dataset.text;
+                errorBox.style.display = 'none';
+                modal.style.display = 'flex';
+            }
+
+            function closeModal() { modal.style.display = 'none'; }
+
+            document.getElementById('edit-backdrop').addEventListener('click', closeModal);
+            document.getElementById('edit-cancel').addEventListener('click', closeModal);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display !== 'none') closeModal();
+            });
+
+            // делегирование: ловим клик по любой .btn-edit
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-edit');
+                if (!btn) return;
+                e.preventDefault();
+                openModal(btn);
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorBox.style.display = 'none';
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Сохранение…';
+
+                const id = document.getElementById('edit-id').value;
+
+                try {
+                    const r = await fetch(`/api/article/${id}/update`, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        credentials: 'same-origin',
+                    });
+                    const data = await readJson(r);
+
+                    if (!r.ok) throw new Error(humanError(r, data, 'Не удалось сохранить'));
+
+                    updateCardInDom(data.article, true);
+                    closeModal();
+                } catch (err) {
+                    errorBox.textContent = 'Ошибка: ' + err.message;
+                    errorBox.style.display = 'block';
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Сохранить';
+                }
+            });
+        })();
+
+        // ============================================================
+        //  УДАЛЕНИЕ
+        // ============================================================
+
+        (function initDelete() {
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.btn-delete');
+                if (!btn) return;
+                e.preventDefault();
+                e.stopPropagation();                      // не всплывать до .card-link
+
+                const id = btn.dataset.id;
+                const name = btn.dataset.name || 'эту статью';
+                if (!id) { alert('Нет id статьи'); return; }
+                if (!confirm(`Удалить «${name}»?`)) return;
+
+                btn.disabled = true;
+                const originalText = btn.textContent;
+                btn.textContent = 'Удаление…';
+
+                try {
+                    const r = await fetch(`/api/article/${id}/delete`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                    });
+                    const data = await r.json().catch(() => ({}));
+
+                    if (!r.ok) {
+                        if (r.status === 401) throw new Error('Вы не авторизованы');
+                        if (r.status === 403) throw new Error('Нет прав на удаление');
+                        throw new Error(data.error || ('HTTP ' + r.status));
+                    }
+
+                    const card = document.querySelector(`.article-card[data-id="${id}"]`);
+                    if (card) card.remove();
+
+                    const grid = document.getElementById('articles-grid');
+                    if (grid && !grid.querySelector('.article-card')) {
+                        grid.outerHTML = '<p class="empty-state" id="empty-state">Статей пока нет</p>';
+                    }
+                } catch (err) {
+                    alert('Не удалось удалить: ' + err.message);
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            });
+        })();
+    })();
+</script>

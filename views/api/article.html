@@ -1,0 +1,81 @@
+<style>
+    .article-card {
+        max-width: 900px;
+        margin: 3em auto;
+        background: #1f1f1f;
+        border: 1px solid #2e2e2e;
+        border-radius: 16px;
+        padding: 32px;
+        color: #eaeaea;
+        font-family: var(--gilroy, Arial, sans-serif);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .article-card h1 {
+        color: #fff;
+        font-size: 2.2rem;
+        margin: 0 0 12px;
+    }
+
+    .article-card .meta {
+        display: flex;
+        gap: 20px;
+        color: #9a9a9a;
+        font-size: 0.95rem;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #2e2e2e;
+    }
+
+    .article-card .meta strong {
+        color: #EAC65E;
+    }
+
+    .article-card img {
+        max-width: 100%;
+        border-radius: 10px;
+        margin: 16px 0;
+    }
+
+    .article-card .body {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .article-card .back {
+        display: inline-block;
+        margin-top: 24px;
+        padding: 10px 20px;
+        background: #A80C0C;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+    .article-card .back:hover {
+        background: #d41a1a;
+    }
+</style>
+
+<div class="article-card">
+    <h1>{{ article.get_name() }}</h1>
+
+    <div class="meta">
+        <span>Автор: <strong>{{ article.get_author().get_nickname() if article.get_author() else article.get_author_id()
+                }}</strong></span>
+        <span>ID: <strong>{{ article.get_id() }}</strong></span>
+        {% if article.get_created_at() %}
+        <span>Дата: <strong>{{ article.get_created_at() }}</strong></span>
+        {% endif %}
+    </div>
+
+    {% if article.get_img() %}
+    <img src="/{{ article.get_img() }}" alt="{{ article.get_name() }}">
+    {% endif %}
+
+    <div class="body">{{ article.get_text() }}</div>
+
+
+</div>

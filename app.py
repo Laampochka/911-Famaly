@@ -62,7 +62,11 @@ import handlers
 from whitenoise import WhiteNoise
 from exceptions import NotFoundException
 from exceptions import UnauthorizedException
+from exceptions import InvalidMethodException
+from exceptions import ForbiddenException 
 from views.view import View
+from itsdangerous import URLSafeTimedSerializer
+import json
 
 
 SECRET_KEY ='uytrewsdfxfcvbnmjiuy76543wesdfcvhiui87654erdfcg'
@@ -86,24 +90,80 @@ class API:
         
         return self.whitenoise(environ, start_response)
     
+    # def handle_request(self, request):
+    #     response = Response()
+    #     try:
+    #         result = self.find_handler_re(request_path=request.path)
+    #         if result is  None:
+    #             raise NotFoundException("статья не найдена")
+    #         handler,params = result
+    #         controller = handler[0](request)
+    #         action = handler[1]
+    #         action(controller,request, response, *params)
+
     def handle_request(self, request):
         response = Response()
         try:
             result = self.find_handler_re(request_path=request.path)
-            if result is  None:
-                raise NotFoundException("статья не найдена")
-            handler,params = result
+            if result is None:
+                raise NotFoundException("страница не найдена")
+
+            handler, params = result
             controller = handler[0](request)
-            action = handler[1]
-            action(controller,request, response, *params)
-            
+
+            # Обработчик может быть:
+            #   - функция:   handler = [Ctrl, Ctrl.index]
+            #   - dict:      handler = [Ctrl, {'GET': Ctrl.index, 'POST': Ctrl.add}]
+            if isinstance(handler[1], dict):
+                allowed = handler[1]
+                if request.method not in allowed:
+                    raise InvalidMethodException(
+                        f"Метод {request.method} не поддерживается для {request.path}"
+                    )
+                action = allowed[request.method]
+            else:
+                action = handler[1]
+
+            action(controller, request, response, *params)
+
+        except InvalidMethodException as e:
+            response.status_code = 405
+            response.headers['Allow'] = ', '.join(allowed.keys()) if isinstance(handler[1], dict) else ''
+            if request.path.startswith('/api/'):
+                response.content_type = 'application/json'
+                response.text = json.dumps({'error': str(e)}, ensure_ascii=False)
+            else:
+                response.text = View('default').render_html(
+                    'errors/405.html', {'error': e}
+                )
+
+        except UnauthorizedException as e:
+            response.status_code = 401
+            # RFC 7617: схема Basic + realm (обязательно в кавычках)
+            response.headers['WWW-Authenticate'] = f'Basic realm="{e.realm}", charset="UTF-8"'
+
+            if request.path.startswith('/api/'):
+                response.content_type = 'application/json'
+                response.text = json.dumps({'error': str(e)}, ensure_ascii=False)
+            else:
+                response.text = View('default').render_html(
+                    'errors/401.html', {'error': e}
+                )      
 
         except NotFoundException as e:
             response.status_code = 404
-            response.text = View('default').render_html('errors/404.html',{'error' : e})
-        except UnauthorizedException as e:
-            response.status_code = 401
-            response.text = View('default').render_html('errors/401.html',{'error' : e})
+            if request.path.startswith('/api/'):
+                response.content_type = 'application/json'
+                response.text = json.dumps({'error': str(e)}, ensure_ascii=False)
+            else:
+                response.text = View('default').render_html('errors/404.html', {'error': e})
+        except ForbiddenException as e:
+            response.status_code = 403
+            if request.path.startswith('/api/'):
+                response.content_type = 'application/json'
+                response.text = json.dumps({'error': str(e)}, ensure_ascii=False)
+            else:
+                response.text = View('default').render_html('errors/403.html', {'error': e})
 
         return response
     

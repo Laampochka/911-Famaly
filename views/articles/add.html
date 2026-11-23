@@ -3,12 +3,35 @@
 <h2 style="color: aliceblue;">Create Article</h2>
 <a href="/articles">bebebe</a>
 
+{# Блок ошибки — показываем, если в контексте есть error #}
+{% if error %}
+<div style="
+        color: #ffb3b3;
+        background: #4a1f1f;
+        border: 1px solid #a33;
+        padding: 10px 14px;
+        margin: 10px 0;
+        border-radius: 4px;
+    ">
+    {{ error }}
+</div>
+{% endif %}
+
 <form enctype="multipart/form-data" action="" method="post" style="color: aliceblue;">
-    <input type="hidden" name="csrf_token" value="{{csrf_token}}">
-    <label>Заголовки <input type="text" name="name"></label><br>
-    <label>Текст <textarea name="text"></textarea></label><br>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
-    <label>Image <input id="inputImg" type="file" name="img"></label><br>
+    <label>Заголовки
+        <input type="text" name="name" value="{{ article_data.name if article_data else '' }}">
+    </label><br>
+
+    <label>Текст
+        <textarea name="text">{{ article_data.text if article_data else '' }}</textarea>
+    </label><br>
+
+    <label>Image
+        <input id="inputImg" type="file" name="img"
+            accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp">
+    </label><br>
+
     <input type="submit" value="Обновить">
-
 </form>
